@@ -1,6 +1,7 @@
 NAME	= philo
 NAME_B	= philo_bonus
-SRCS	= philo.c
+SRCS	= philo.c \
+			philo_utils.c
 SRCS_B	= philo_bonus.c
 OBJS	= $(SRCS:.c=.o)
 OBJS_B	= $(SRCS_B:.c=.o)
@@ -20,11 +21,8 @@ $(NAME):	$(OBJS) PHILO
 $(NAME_B):	$(OBJS_B) PHILO_B
 			@$(CC) $(OBJS_B) -o $(NAME_B)		
 
-$(OBJS):	$(SRCS)
-			@$(CC) -c $(SRCS) -o $(OBJS)
-
-$(OBJS_B):	$(SRCS_B)
-			@$(CC) -c $(SRCS_B) -o $(OBJS_B)
+%.o: %.c
+			$(CC) -c $(CFLAGS) -o $@ $<
 
 clean:		CLEAN
 			@$(RM) $(OBJS)

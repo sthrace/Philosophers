@@ -19,10 +19,22 @@ typedef struct	fork
 	pthread_mutex_t	*forks;
 }				t_forks;
 
+typedef struct	args
+{
+	int		die;
+	int		eat;
+	int		sleep;
+	int		nummeals;
+	int		numphilo;
+}			t_args;
+
 typedef struct all
 {
 	t_philo	*philo;
 	t_forks	*forks;
+	t_args	args;
 }				t_all;
+
+int	ft_atoi_philo(char *nb, int type);
 
 #endif

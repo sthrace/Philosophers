@@ -19,28 +19,32 @@ void	*routine()
 
 void	ft_init(t_all *all, int argc, char **argv)
 {
-	all->forks = (t_forks *)malloc(sizeof(t_forks) * argc);
-	all->philo = (t_philo *)malloc(sizeof(t_philo) * argc);
+	all->args.numphilo = ft_atoi_philo(argv[1], 1);
+	all->forks = (t_forks *)malloc(sizeof(t_forks) * all->args.numphilo);
+	all->philo = (t_philo *)malloc(sizeof(t_philo) * all->args.numphilo);
+	all->args.die = ft_atoi_philo(argv[2], 2);
+	all->args.eat = ft_atoi_philo(argv[3], 2);
+	all->args.sleep = ft_atoi_philo(argv[4], 2);
+	if (argc == 6)
+		all->args.nummeals = ft_atoi_philo(argv[5], 2);
 }
 
 int	main(int argc, char **argv)
 {
 	t_all	*all;
+	int		i;
 
+	if (argc < 5 || argc > 6)
+	{
+		write(2, "Must provide at 4 or 5 arguments\n",34);
+		exit (1);
+	}
+	i = 1;
+	while (argv[++i])
+		ft_atoi_philo(argv[i], 2);
 	all = (t_all *)malloc(sizeof(t_all));
 	if (!all)
 		return (1);
-	ft_init(&all, argc, argv);
-	pthread_mutex_init(&mutex, NULL);
-	if (pthread_create(&t1, NULL, &routine, NULL))
-		return (1);
-	if (pthread_create(&t2, NULL, &routine, NULL))
-		return (1);
-	if (pthread_join(t1, NULL))
-		return (1);
-	if (pthread_join(t2, NULL))
-		return (1);
-	pthread_mutex_destroy(&mutex);
-	printf("Mails: %d\n", mails);
+	ft_init(all, argc, argv);
 	return (0);
 }
