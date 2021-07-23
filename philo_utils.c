@@ -1,11 +1,13 @@
 #include "philo.h"
 
-static void	ft_exit(int err)
+void	ft_exit(int err)
 {
 	if (err == 1)
 		write(2, "Argument must be a positive integer\n", 36);
 	if (err == 2)
 		write(2, "Provide valid number of pilosophers 1-200\n", 42);
+	if (err == 3)
+		write(2, "Must provide 4 or 5 arguments\n",34);
 	exit (1);
 }
 

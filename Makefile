@@ -35,7 +35,7 @@ fclean:		clean FCLEAN
 re:			fclean all
 
 leaks:
-			valgrind --leak-check=full --show-leak-kinds=definite $(NAME) 5 800 200 200 7
+			valgrind --leak-check=full --show-leak-kinds=definite ./$(NAME) 1 800 200 200 7
 
 git:
 			make fclean

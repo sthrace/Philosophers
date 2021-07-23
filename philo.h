@@ -9,7 +9,7 @@
 
 typedef struct philo
 {
-	char	number;
+	int		number;
 	int		left;
 	int		right;
 }				t_philo;
@@ -30,11 +30,12 @@ typedef struct	args
 
 typedef struct all
 {
-	t_philo	*philo;
-	t_forks	*forks;
+	t_philo	**philo;
+	t_forks	**forks;
 	t_args	args;
 }				t_all;
 
 int	ft_atoi_philo(char *nb, int type);
+void	ft_exit(int err);
 
 #endif
