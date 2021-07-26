@@ -7,35 +7,28 @@
 # include <pthread.h>
 # include <sys/time.h>
 
-typedef struct philo
+typedef struct s_philo
 {
-	int		number;
-	int		left;
-	int		right;
+	pthread_t	thread;
+	int			left;
+	int			right;
+	int			number;
+	int			ate;
 }				t_philo;
 
-typedef struct	fork
-{
-	pthread_mutex_t	*forks;
-}				t_forks;
 
-typedef struct	args
+typedef struct s_data
 {
+	t_philo	*philo;
+	int		philo_cnt;
 	int		die;
 	int		eat;
 	int		sleep;
-	int		nummeals;
-	int		numphilo;
-}			t_args;
+	int		eat_cnt;
+}				t_data;
 
-typedef struct all
-{
-	t_philo	**philo;
-	t_forks	**forks;
-	t_args	args;
-}				t_all;
 
-int	ft_atoi_philo(char *nb, int type);
+int		ft_atoi_philo(char *nb, int type);
 void	ft_exit(int err);
 
 #endif

@@ -1,63 +1,81 @@
 #include "philo.h"
 
-void	*ft_dinner(t_all *all)
-{
-	int	i;
-	pthread_mutex_lock(all->forks[i]);
-	pthread_mutex_unlock(all->forks[i]);
-}
+int	mails = 0;
+pthread_mutex_t	mutex;
 
-void	ft_begin(t_all *all)
+void	*routine(t_data *data)
 {
-	int	i;
-	pthread_t	*philo_t;
-
-	i = 0;
-	while (i < all->args.numphilo)
+	// int		i;
+	// i = 0;
+	// while (i < 1000000)
+	// {
+	// 	pthread_mutex_lock(&mutex);
+	// 	mails++;
+	// 	pthread_mutex_unlock(&mutex);
+	// 	i++;
+	// }
+	// return (NULL);
+	while (1)
 	{
-		pthread_create(&philo_t[i], NULL, ft_dinner(all), NULL);
-		i++;
+		printf("Philo %d is thinking\n", data->philo->number);
+		printf("Philo %d is eating\n", data->philo->number);
+		usleep(data->eat);
+		printf("Philo %d is sleeping\n", data->philo->number);
+		usleep(data->sleep);
 	}
 }
 
-void	ft_init(t_all *all, int argc, char **argv)
+int	ft_init_simulation(t_data *data)
 {
 	int	i;
 
 	i = 0;
-	all->args.numphilo = ft_atoi_philo(argv[1], 1);
-	all->args.die = ft_atoi_philo(argv[2], 2);
-	all->args.eat = ft_atoi_philo(argv[3], 2);
-	all->args.sleep = ft_atoi_philo(argv[4], 2);
+	pthread_mutex_init(&mutex, NULL);		// initialize mutex;
+	while (i < data->philo_cnt)
+	{
+		data->philo->number = i + 1;
+		if (pthread_create(&data->philo[i].thread, NULL, &routine(data), NULL))		//create thread
+			return (1);
+		printf("Thread %d started\n", i);
+		i++;
+	}
+	i = 0;
+	while (i < data->philo_cnt)
+	{
+		if (pthread_join(data->philo[i].thread, NULL))
+			return (1);
+		printf("Thread %d finished\n", i);
+		i++;
+	}
+	pthread_mutex_destroy(&mutex);		//free memory allocated to mutex;
+	printf("Number of mails: %d\n", mails);
+	return (0);
+}
+
+void	ft_init_struct(t_data *data, int argc, char **argv)
+{
+	data->philo_cnt = ft_atoi_philo(argv[1], 1);
+	data->die = ft_atoi_philo(argv[2], 2);
+	data->eat = ft_atoi_philo(argv[3], 2);
+	data->sleep = ft_atoi_philo(argv[4], 2);
 	if (argc == 6)
-		all->args.nummeals = ft_atoi_philo(argv[5], 2);
-	all->forks = (t_forks **)malloc(sizeof(t_forks *) * all->args.numphilo);
-	all->philo = (t_philo **)malloc(sizeof(t_philo *) * all->args.numphilo);
-	if (!all->forks || !all->philo)
-		exit(1);
-	while (i < all->args.numphilo)
-	{
-		all->forks[i] = (t_forks *)malloc(sizeof(t_forks));
-		all->philo[i] = (t_philo *)malloc(sizeof(t_philo));
-		all->philo[i]->number = i + 1;
-		i++;
-	}
+		data->eat_cnt = ft_atoi_philo(argv[5], 2);
+	else
+		data->eat_cnt = -1;
+	data->philo = (t_philo *)malloc(sizeof(t_philo) * data->philo_cnt);
 }
 
 int	main(int argc, char **argv)
 {
-	int		i;
-	t_all	*all;
+	t_data	*data;
 
 	if (argc < 5 || argc > 6)
 		ft_exit(3);
-	i = 1;
-	while (argv[++i])
-		ft_atoi_philo(argv[i], 2);
-	all = (t_all *)malloc(sizeof(t_all));
-	if (all == NULL)
+	data = (t_data *)malloc(sizeof(t_data));
+	if (!data)
 		return (1);
-	ft_init(all, argc, argv);
-	ft_begin(all);
+	ft_init_struct(data, argc, argv);
+	if (ft_init_simulation(data))
+		return (1);
 	return (0);
 }

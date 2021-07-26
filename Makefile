@@ -16,13 +16,13 @@ all:	$(HEADER) $(NAME)
 bonus:	$(HEADER_B) $(NAME_B)
 
 $(NAME):	$(OBJS) PHILO
-			@$(CC) $(OBJS) -o $(NAME)
+			@$(CC) $(FLAGS) $(OBJS) -o $(NAME)
 
 $(NAME_B):	$(OBJS_B) PHILO_B
-			@$(CC) $(OBJS_B) -o $(NAME_B)		
+			@$(CC) $(FLAGS) $(OBJS_B) -o $(NAME_B)		
 
 %.o: %.c
-			$(CC) -c $(CFLAGS) -o $@ $<
+			$(CC) -c $(FLAGS) -o $@ $<
 
 clean:		CLEAN
 			@$(RM) $(OBJS)
