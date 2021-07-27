@@ -8,6 +8,14 @@ void	ft_exit(int err)
 		write(2, "Provide valid number of pilosophers 1-200\n", 42);
 	if (err == 3)
 		write(2, "Must provide 4 or 5 arguments\n",34);
+	if (err == 4)
+		write(2, "Gettimeofday malfunction\n", 25);
+	if (err == 5)
+		write(2, "Malloc failure\n", 15);
+	if (err == 6)
+		write(2, "Pthread create failed\n", 22);
+	if (err == 7)
+		write(2, "Pthread join failed\n", 20);
 	exit (1);
 }
 

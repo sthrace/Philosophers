@@ -6,26 +6,33 @@
 # include <stdlib.h>
 # include <pthread.h>
 # include <sys/time.h>
-
-typedef struct s_philo
-{
-	pthread_t	thread;
-	int			left;
-	int			right;
-	int			number;
-	int			ate;
-}				t_philo;
-
+# include <sys/types.h>
+# include <stdint.h>
 
 typedef struct s_data
 {
-	t_philo	*philo;
 	int		philo_cnt;
 	int		die;
 	int		eat;
 	int		sleep;
 	int		eat_cnt;
+	uint64_t		start;
 }				t_data;
+typedef struct s_philo
+{
+	pthread_t		thread;
+	int				number;
+	int				ate;
+	pthread_mutex_t	lfork;
+	pthread_mutex_t	*rfork;
+	t_data			*data;
+}				t_philo;
+
+typedef struct s_all
+{
+	t_philo	*philo;
+	t_data	data;
+}				t_all;
 
 
 int		ft_atoi_philo(char *nb, int type);
