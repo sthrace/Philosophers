@@ -10,6 +10,7 @@ void	ft_mdestroy(t_all *all)
 		pthread_mutex_destroy(&all->philo[i].lfork);
 		i++;
 	}
+	pthread_mutex_destroy(&all->data.death);
 }
 
 void	ft_join(t_all *all)
@@ -23,16 +24,13 @@ void	ft_join(t_all *all)
 			ft_exit(8);
 		i++;
 	}
-	if (pthread_join(all->data.death, NULL))
-			ft_exit(8);
 	ft_mdestroy(all);
 }
 
 void	ft_pthread_start(t_all *all,  int i)
 {
 	pthread_mutex_init(&all->data.print, NULL);
-	if (pthread_create(&all->data.death, NULL, &death_check, &all))
-				ft_exit(6);
+	pthread_mutex_init(&all->data.death, NULL);
 	while (++i < all->data.philo_cnt)
 	{
 		if (i % 2)
@@ -43,6 +41,7 @@ void	ft_pthread_start(t_all *all,  int i)
 		}
 	}
 	i = -1;
+	ft_usleep(all->data.eat / 10);
 	while (++i < all->data.philo_cnt)
 	{
 		if (!(i % 2))

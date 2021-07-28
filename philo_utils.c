@@ -22,7 +22,7 @@ void	ft_printer(t_philo *philo, char *str)
 {
 	uint64_t	now;
 
-	now = ft_get_time() - philo->data->start;
+	now = ((ft_get_time() - philo->data->start) / 1000);
 	printf("%lu %d %s\n", now, philo->number, str);
 }
 

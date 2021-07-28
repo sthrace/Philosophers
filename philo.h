@@ -20,7 +20,7 @@ typedef struct s_data
 	int				is_alive;
 	uint64_t		start;
 	pthread_mutex_t	print;
-	pthread_t		death;
+	pthread_mutex_t	death;
 }				t_data;
 
 typedef struct s_philo
