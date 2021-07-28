@@ -1,5 +1,17 @@
 #include "philo.h"
 
+void	ft_mdestroy(t_all *all)
+{
+	int	i;
+
+	i = 0;
+	while (i < all->data.philo_cnt)
+	{
+		pthread_mutex_destroy(&all->philo[i].lfork);
+		i++;
+	}
+}
+
 void	ft_join(t_all *all)
 {
 	int	i;
@@ -11,20 +23,17 @@ void	ft_join(t_all *all)
 			ft_exit(8);
 		i++;
 	}
-	i = 0;
-	while (i < all->data.philo_cnt)
-	{
-		pthread_mutex_destroy(&all->philo[i].lfork);
-		i++;
-	}
+	if (pthread_join(all->data.death, NULL))
+			ft_exit(8);
+	ft_mdestroy(all);
 }
 
-void	ft_pthread_start(t_all *all)
+void	ft_pthread_start(t_all *all,  int i)
 {
-	int	i;
-
-	i = 0;
-	while (i < all->data.philo_cnt)
+	pthread_mutex_init(&all->data.print, NULL);
+	if (pthread_create(&all->data.death, NULL, &death_check, &all))
+				ft_exit(6);
+	while (++i < all->data.philo_cnt)
 	{
 		if (i % 2)
 		{
@@ -32,10 +41,9 @@ void	ft_pthread_start(t_all *all)
 			if (pthread_create(&all->philo[i].thread, NULL, &lifecycle, &all->philo[i]))
 				ft_exit(6);
 		}
-		i++;
 	}
-	i = 0;
-	while (i < all->data.philo_cnt)
+	i = -1;
+	while (++i < all->data.philo_cnt)
 	{
 		if (!(i % 2))
 		{
@@ -43,7 +51,6 @@ void	ft_pthread_start(t_all *all)
 			if (pthread_create(&all->philo[i].thread, NULL, &lifecycle, &all->philo[i]))
 				ft_exit(6);
 		}
-		i++;
 	}
 	ft_join(all);
 }
@@ -73,6 +80,5 @@ void	ft_pthread_init(t_all *all)
 			all->philo[i].got_food = 0;
 		i++;
 	}
-	pthread_mutex_init(&all->data.print, NULL);
-	ft_pthread_start(all);
+	ft_pthread_start(all, -1);
 }

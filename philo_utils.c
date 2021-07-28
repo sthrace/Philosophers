@@ -23,7 +23,7 @@ void	ft_printer(t_philo *philo, char *str)
 	uint64_t	now;
 
 	now = ft_get_time() - philo->data->start;
-	printf("%llu %d %s\n", now, philo->number, str);
+	printf("%lu %d %s\n", now, philo->number, str);
 }
 
 void	ft_meal_counter(t_philo *temp)

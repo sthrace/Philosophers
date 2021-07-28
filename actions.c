@@ -1,18 +1,30 @@
 #include "philo.h"
 
-void	ft_check_death(t_philo *ph)
+void	*death_check(void *arg)
 {
 	uint64_t	time;
+	t_all	*all;
+	int		i;
+
+	all = (t_all *)arg;
 
 	time = ft_get_time();
-	if ((time - ph->start_meal) > (uint64_t)ph->data->die)
+	while (1)
 	{
-		ph->data->death = 1;
-		pthread_mutex_lock(&ph->data->print);
-		ft_printer(ph, "died");
-		pthread_mutex_unlock(&ph->data->print);
-		ft_exit(10);
+		i = 0;
+		while (i < all->data.philo_cnt)
+		{
+			if ((time - all->philo[i].start_meal) > (uint64_t)all->data.die)
+			{
+				all->data.is_alive = 0;
+				pthread_mutex_lock(&all->data.print);
+				ft_printer(all->philo, "died");
+				ft_exit(10);
+			}
+			i++;
+		}
 	}
+	return (NULL);
 }
 
 void	ft_eat(t_philo *ph)
@@ -29,33 +41,27 @@ void	ft_eat(t_philo *ph)
 	pthread_mutex_lock(ph->rfork);
 	pthread_mutex_lock(&ph->data->print);
 	ft_printer(ph, "has taken a fork");
-	ft_check_death(ph);
 	ph->start_meal = ft_get_time();
 	ft_printer(ph, "is eating");
 	pthread_mutex_unlock(&ph->data->print);
 	ft_usleep(ph->data->eat / 1000);
 	pthread_mutex_unlock(ph->rfork);
 	pthread_mutex_unlock(&ph->lfork);
-	ft_check_death(ph);
 }
 
 void	ft_sleep(t_philo *ph)
 {
-	ft_check_death(ph);
 	pthread_mutex_lock(&ph->data->print);
 	ft_printer(ph, "is sleeping");
 	pthread_mutex_unlock(&ph->data->print);
 	ft_usleep(ph->data->sleep / 1000);
-	ft_check_death(ph);
 }
 
 void	ft_think(t_philo *ph)
 {
-	ft_check_death(ph);
 	pthread_mutex_lock(&ph->data->print);
 	ft_printer(ph, "is thinking");
 	pthread_mutex_unlock(&ph->data->print);
-	ft_check_death(ph);
 }
 
 void	*lifecycle(void *arg)
@@ -63,25 +69,18 @@ void	*lifecycle(void *arg)
 	t_philo	*ph;
 
 	ph = (t_philo *)arg;
-	while (1)
+	while (ph->data->is_alive)
 	{
-	// 	if (ph->data->satisfied == ph->data->philo_cnt)
-	// 	{
-	// 		pthread_mutex_lock(&ph->data->print);
-	// 		ft_exit(9);
-	// 	}
-	// 	printf("Will now eat\n");
+		if (ph->data->satisfied == ph->data->philo_cnt)
+		{
+			pthread_mutex_lock(&ph->data->print);
+			ft_exit(9);
+		}
 		ft_eat(ph);
-	// 	if (ph->data->eat_cnt != -1)
-	// 		ft_meal_counter(ph);
+		if (ph->data->eat_cnt != -1)
+			ft_meal_counter(ph);
 		ft_sleep(ph);
 		ft_think(ph);
 	}
-	// return (NULL);
-	// t_philo	*ph;
-
-	// ph = (t_philo *)arg;
-	// ph->got_food = 7;
-	// printf("ph number %d Got food\n", ph->number);
 	return (NULL);
 }

@@ -31,7 +31,7 @@ void	ft_init_struct(t_all *all, int argc, char **argv)
 	all->data.sleep = ft_atoi_philo(argv[4], 2);
 	all->data.start = ft_get_time();
 	all->data.eat_cnt = -1;
-	all->data.death = 0;
+	all->data.is_alive = 1;
 	pthread_mutex_init(&all->data.print, NULL);
 	if (argc == 6)
 		all->data.eat_cnt = ft_atoi_philo(argv[5], 2);
