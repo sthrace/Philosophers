@@ -1,22 +1,36 @@
 #include "philo.h"
 
-void	ft_exit(int err)
+void	ft_usleep(uint64_t time)
 {
-	if (err == 1)
-		write(2, "Argument must be a positive integer\n", 36);
-	if (err == 2)
-		write(2, "Provide valid number of pilosophers 1-200\n", 42);
-	if (err == 3)
-		write(2, "Must provide 4 or 5 arguments\n",34);
-	if (err == 4)
-		write(2, "Gettimeofday malfunction\n", 25);
-	if (err == 5)
-		write(2, "Malloc failure\n", 15);
-	if (err == 6)
-		write(2, "Pthread create failed\n", 22);
-	if (err == 7)
-		write(2, "Pthread join failed\n", 20);
-	exit (1);
+	uint64_t	timer;
+
+	timer = ft_get_time();
+	while ((ft_get_time() - timer) < time)
+		usleep(time / 10);
+}
+
+uint64_t	ft_get_time()
+{
+	struct timeval	time;
+
+	if (gettimeofday(&time, NULL))
+		ft_exit(5);
+	return (time.tv_sec * (uint64_t)1000000 + time.tv_usec);
+}
+
+void	ft_printer(t_philo *philo, char *str)
+{
+	uint64_t	now;
+
+	now = ft_get_time() - philo->data->start;
+	printf("%llu %d %s\n", now, philo->number, str);
+}
+
+void	ft_meal_counter(t_philo *temp)
+{
+	temp->got_food++;
+	if (temp->got_food == temp->data->eat_cnt)
+		temp->data->satisfied++;
 }
 
 int	ft_atoi_philo(char *nb, int type)
@@ -28,7 +42,7 @@ int	ft_atoi_philo(char *nb, int type)
 	res = 0;
 	while (nb[++i])
 		if (nb[i] != ' ' && nb[i] != '+' && nb[i] < '0' && nb[i] > 9)
-			ft_exit(1);
+			ft_exit(3);
 	i = 0;
 	while (nb[i] == ' ' && nb[i] == '+')
 		i++;
@@ -38,8 +52,8 @@ int	ft_atoi_philo(char *nb, int type)
 		i++;
 	}
 	if (type == 1 && (res < 1 || res > 200))
-		ft_exit(2);
+		ft_exit(4);
 	if (nb[i])
-		ft_exit(1);
+		ft_exit(3);
 	return (res);
 }
