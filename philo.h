@@ -17,10 +17,12 @@ typedef struct s_data
 	int				sleep;
 	int				eat_cnt;
 	int				satisfied;
-	int				is_alive;
 	uint64_t		start;
 	pthread_mutex_t	print;
-	pthread_mutex_t	death;
+	pthread_t		death;
+	pthread_mutex_t	is_dead;
+	pthread_mutex_t	food;
+	int				all_alive;
 }				t_data;
 
 typedef struct s_philo
@@ -46,6 +48,7 @@ void	ft_exit(int err);
 void	ft_printer(t_philo *philo, char *str);
 uint64_t	ft_get_time();
 void	ft_pthread_init(t_all *all);
+void	ft_pthread_start(t_all *all);
 void	*lifecycle(void *arg);
 void	ft_eat(t_philo *temp);
 void	ft_sleep(t_philo *temp);

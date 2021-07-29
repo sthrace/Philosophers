@@ -7,7 +7,7 @@ uint64_t	ft_get_time(void)
 	to_return = time.tv_sec * 1000 + time.tv_usec / 1000;
 	return (to_return);
 }
-[4:49 PM] void	ft_fix_usleep(uint64_t msec)
+void	ft_fix_usleep(uint64_t msec)
 {
 	 uint64_t	start;
 	 start = ft_get_time();

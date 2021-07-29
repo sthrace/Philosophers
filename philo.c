@@ -13,11 +13,11 @@ void	ft_exit(int err)
 	if (err == 5)
 		write(2, "Gettimeofday malfunction\n", 25);
 	if (err == 6)
-		write(2, "Pthread create failed\n", 22);
-	if (err == 7)
 		write(2, "Pthread mutex init failed\n", 26);
+	if (err == 7)
+		write(2, "Pthread create failed\n", 22);
 	if (err == 8)
-		write(2, "Pthread join failed\n", 20);
+		write(2, "Pthread join/detatch failed\n", 28);
 	if (err == 9)
 		write(1, "All philosophers ate\n", 21);
 	exit (1);
@@ -31,7 +31,7 @@ void	ft_init_struct(t_all *all, int argc, char **argv)
 	all->data.sleep = ft_atoi_philo(argv[4], 2);
 	all->data.start = ft_get_time();
 	all->data.eat_cnt = -1;
-	all->data.is_alive = 1;
+	all->data.all_alive = 1;
 	pthread_mutex_init(&all->data.print, NULL);
 	if (argc == 6)
 		all->data.eat_cnt = ft_atoi_philo(argv[5], 2);
@@ -50,5 +50,6 @@ int	main(int argc, char **argv)
 		ft_exit(2);
 	ft_init_struct(all, argc, argv);
 	ft_pthread_init(all);
+	ft_pthread_start(all);
 	return (0);
 }

@@ -15,14 +15,14 @@ uint64_t	ft_get_time()
 
 	if (gettimeofday(&time, NULL))
 		ft_exit(5);
-	return (time.tv_sec * (uint64_t)1000000 + time.tv_usec);
+	return (time.tv_sec * 1000 + time.tv_usec / 1000);
 }
 
 void	ft_printer(t_philo *philo, char *str)
 {
 	uint64_t	now;
 
-	now = ((ft_get_time() - philo->data->start) / 1000);
+	now = ((ft_get_time() - philo->data->start));
 	printf("%lu %d %s\n", now, philo->number, str);
 }
 
