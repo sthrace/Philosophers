@@ -9,52 +9,59 @@
 # include <sys/types.h>
 # include <stdint.h>
 
+# define ALIVE 0
+# define DEAD 1
+# define FULL 2
+typedef struct s_mutex
+{
+	pthread_mutex_t	m_print;
+	pthread_mutex_t	m_food;
+	pthread_mutex_t	m_death;
+}				t_mutex;
 typedef struct s_data
 {
-	int				philo_cnt;
-	int				die;
-	int				eat;
-	int				sleep;
-	int				eat_cnt;
-	int				satisfied;
+	int				cnt;
+	int				meals;
+	int				status;
+	int				full;
+	int				t2d;
+	int				t2e;
+	int				t2s;
 	uint64_t		start;
-	pthread_mutex_t	print;
-	pthread_t		death;
-	pthread_mutex_t	is_dead;
-	pthread_mutex_t	food;
-	int				all_alive;
+	
 }				t_data;
-
 typedef struct s_philo
 {
-	pthread_t		thread;
+	int				id;
+	int				num_meals;
+	uint64_t		last_meal;
+	pthread_t		t_ph;
 	pthread_mutex_t	lfork;
 	pthread_mutex_t	*rfork;
-	int				number;
-	int				got_food;
-	uint64_t		start_meal;
 	t_data			*data;
+	t_mutex			*mutex;
 }				t_philo;
 
-typedef struct s_all
-{
-	t_philo	*philo;
-	t_data	data;
-}				t_all;
 
+// philo.c //
 
-int		ft_atoi_philo(char *nb, int type);
-void	ft_exit(int err);
-void	ft_printer(t_philo *philo, char *str);
-uint64_t	ft_get_time();
-void	ft_pthread_init(t_all *all);
-void	ft_pthread_start(t_all *all);
+// init.c //
+
+int	simulation_init(t_philo *ph, t_data *data, t_mutex *mutex);
+
+// activity.c //
+
 void	*lifecycle(void *arg);
-void	ft_eat(t_philo *temp);
-void	ft_sleep(t_philo *temp);
-void	ft_think(t_philo *temp);
-void	*death_check(void *arg);
-void	ft_meal_counter(t_philo *temp);
+
+// monitor.c //
+
+void	food_counter(t_philo *ph);
+void	checkdeath(t_philo *ph);
+
+// utils.c //
+
 void	ft_usleep(uint64_t time);
+uint64_t	ft_gettime();
+void	ft_print(t_philo *ph, char *str);
 
 #endif
