@@ -6,7 +6,7 @@ void	ft_usleep(uint64_t time)
 
 	timer = ft_gettime();
 	while ((ft_gettime() - timer) < time)
-		usleep(1000);
+		usleep(1);
 }
 
 uint64_t	ft_gettime()
@@ -22,6 +22,9 @@ void	ft_print(t_philo *ph, char *str)
 {
 	uint64_t	now;
 
+	pthread_mutex_lock(&ph->data->m_print);
 	now = ((ft_gettime() - ph->data->start));
-	printf("%lu %d %s\n", now, ph->id, str);
+	if (ph->data->status == ALIVE)
+		printf("%lu %d %s\n", now, ph->id, str);
+	pthread_mutex_unlock(&ph->data->m_print);
 }

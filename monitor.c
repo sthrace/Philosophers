@@ -2,32 +2,37 @@
 
 void	food_counter(t_philo *ph)
 {
-	pthread_mutex_lock(&ph->mutex->m_food);
-	ph->last_meal = ft_gettime();
 	ph->num_meals++;
 	if (ph->num_meals == ph->data->meals)
 		ph->data->full++;
 	if (ph->data->full == ph->data->cnt)
 	{
+		// pthread_mutex_lock(&ph->data->m_death);
 		ph->data->status = FULL;
 		printf("All philosophers ate %d times\n", ph->data->meals);
+		return ;
 	}
-	pthread_mutex_unlock(&ph->mutex->m_food);
 }
 
-void	checkdeath(t_philo *ph)
+void	*deathcycle(void *arg)
 {
-	uint64_t	now;
-	uint64_t	diff;
+	t_philo			*ph;
+	uint64_t		now;
+	uint64_t		diff;
 
-	pthread_mutex_lock(&ph->mutex->m_death);
-	now = ft_gettime();
-	diff = now - ph->last_meal;
-	printf("Diff for %d is %lu\n", ph->id, diff);
-	if (diff > (uint64_t)ph->data->t2d)
+	ph = (t_philo *)arg;
+	while (ph->data->status ==ALIVE)
 	{
-		ph->data->status = DEAD;
-		ft_print(ph, "died");
+		pthread_mutex_lock(&ph->data->m_death);
+		now = ft_gettime();
+		diff = now - ph->last_meal;
+		pthread_mutex_unlock(&ph->data->m_death);
+		if (diff > (uint64_t)ph->data->t2d)
+		{
+			ft_print(ph, "died");
+			ph->data->status = DEAD;
+			return (NULL);
+		}
 	}
-	pthread_mutex_unlock(&ph->mutex->m_death);
+	return (NULL);
 }

@@ -1,6 +1,6 @@
 NAME	= philo
 NAME_B	= philo_bonus
-SRCS	= philo.c init.c activity.c monitor.c utils.c
+SRCS	= philo.c activity.c monitor.c utils.c
 SRCS_B	= philo_bonus.c
 OBJS	= $(SRCS:.c=.o)
 OBJS_B	= $(SRCS_B:.c=.o)

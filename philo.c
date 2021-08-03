@@ -17,16 +17,31 @@ static int	ft_atoi_philo(char *arg)
 	return ((int)res);
 }
 
-static int	init_mutex(t_mutex *mutex)
+static int	init_philo(t_philo *ph, t_data *data)
 {
-	if (pthread_mutex_init(&mutex->m_print, NULL) \
-	|| pthread_mutex_init(&mutex->m_death, NULL) \
-	|| pthread_mutex_init(&mutex->m_food, NULL))
+	int	i;
+
+	i = 0;
+	while (i < data->cnt)
 	{
-		printf("Mutex init failed\n");
-		return (1);
+		ph[i].id = i + 1;
+		ph[i].data = data;
+		ph[i].last_meal = data->start;
+		ph[i].num_meals = 0;
+		if (pthread_mutex_init(&ph[i].lfork, NULL))
+		{
+			printf("Fork mutex init failed\n");
+			return (1);
+		}
+		if (i == data->cnt - 1)
+			ph[i].rfork = &ph[0].lfork;
+		else
+			ph[i].rfork = &ph[i + 1].lfork;
+		i++;
 	}
-	return (0);	
+	if (thread_init(ph, -1))
+		return (1);
+	return (0);
 }
 
 static int	init_data(t_data *data, int argc, char **argv)
@@ -41,6 +56,14 @@ static int	init_data(t_data *data, int argc, char **argv)
 	data->status = ALIVE;
 	if (argc == 6)
 		data->meals = ft_atoi_philo(argv[5]);
+	if (pthread_mutex_init(&data->m_print, NULL) \
+	|| pthread_mutex_init(&data->m_death, NULL) \
+	|| pthread_mutex_init(&data->m_food, NULL))
+	{
+		printf("Mutex init failed\n");
+		return (1);
+	}
+	return (0);	
 	if (!data->cnt || !data->t2d || !data->t2e || !data->t2s || (argc == 6 && !data->meals) || !data->start)
 	{
 		printf("Data initialization failed\n");
@@ -76,14 +99,13 @@ int	main(int argc, char **argv)
 {
 	t_philo	*ph;
 	t_data	data;
-	t_mutex	mutex;
 
 	if (argc < 5 || argc > 6)
 	{
 		printf("Number of arguments must be 4 or 5\n");
 		return (1);
 	}
-	if (validate_argv(argv) || init_data(&data, argc, argv) || init_mutex(&mutex))
+	if (validate_argv(argv) || init_data(&data, argc, argv))
 		return (1);
 	ph = (t_philo *)malloc(sizeof(t_philo) * data.cnt);
 	if (ph == NULL)
@@ -91,7 +113,7 @@ int	main(int argc, char **argv)
 		printf("Malloc for philo structure failed\n");
 		return (1);
 	}
-	if (simulation_init(ph, &data, &mutex))
+	if (init_philo(ph, &data))
 		return (1);
 	return (0);
 }

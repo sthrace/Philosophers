@@ -12,12 +12,6 @@
 # define ALIVE 0
 # define DEAD 1
 # define FULL 2
-typedef struct s_mutex
-{
-	pthread_mutex_t	m_print;
-	pthread_mutex_t	m_food;
-	pthread_mutex_t	m_death;
-}				t_mutex;
 typedef struct s_data
 {
 	int				cnt;
@@ -28,7 +22,10 @@ typedef struct s_data
 	int				t2e;
 	int				t2s;
 	uint64_t		start;
-	
+	pthread_t		t_death;
+	pthread_mutex_t	m_print;
+	pthread_mutex_t	m_food;
+	pthread_mutex_t	m_death;	
 }				t_data;
 typedef struct s_philo
 {
@@ -39,7 +36,6 @@ typedef struct s_philo
 	pthread_mutex_t	lfork;
 	pthread_mutex_t	*rfork;
 	t_data			*data;
-	t_mutex			*mutex;
 }				t_philo;
 
 
@@ -47,16 +43,15 @@ typedef struct s_philo
 
 // init.c //
 
-int	simulation_init(t_philo *ph, t_data *data, t_mutex *mutex);
-
 // activity.c //
 
+int	thread_init(t_philo *ph, int i);
 void	*lifecycle(void *arg);
 
 // monitor.c //
 
 void	food_counter(t_philo *ph);
-void	checkdeath(t_philo *ph);
+void	*deathcycle(void *arg);
 
 // utils.c //
 

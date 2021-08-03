@@ -1,92 +1,92 @@
 #include "philo.h"
 
-static void	ft_sleep(t_philo *ph)
+static void	ft_eat(t_philo *ph)
 {
-	if (ph->data->status != ALIVE)
-		return ;
-	pthread_mutex_lock(&ph->mutex->m_print);
-	if (ph->data->status == ALIVE)
-		ft_print(ph, "is sleeping");
-	pthread_mutex_unlock(&ph->mutex->m_print);
-	ft_usleep(ph->data->t2s);
-	if (ph->data->status != ALIVE)
-		return ;
-	pthread_mutex_lock(&ph->mutex->m_print);
-	if (ph->data->status == ALIVE)
-		ft_print(ph, "is thinking");
-	pthread_mutex_unlock(&ph->mutex->m_print);
-}
-
-static void	ft_eat_r(t_philo *ph)
-{
-	if (ph->data->status != ALIVE)
-		return ;
-	pthread_mutex_lock(ph->rfork);
-	pthread_mutex_lock(&ph->mutex->m_print);
-	if (ph->data->status == ALIVE)
-		ft_print(ph, "has taken a fork");
-	pthread_mutex_unlock(&ph->mutex->m_print);
 	pthread_mutex_lock(&ph->lfork);
-	pthread_mutex_lock(&ph->mutex->m_print);
-	if (ph->data->status == ALIVE)
-		checkdeath(ph);			// taking up 200 ms time && too few deathchecks. must print death not later than 10 ms after philo dies
-	if (ph->data->status == ALIVE)
+	ft_print(ph, "has taken a fork");
+	if (ph->data->cnt == 1)
 	{
-		ft_print(ph, "has taken a fork");
-		ft_print(ph, "is eating");
+		pthread_mutex_unlock(&ph->lfork);
+		return ;
 	}
-	pthread_mutex_unlock(&ph->mutex->m_print);
+	pthread_mutex_lock(ph->rfork);
+	ft_print(ph, "has taken a fork");
+	pthread_mutex_lock(&ph->data->m_food);
+	ph->last_meal = ft_gettime();
+	pthread_mutex_unlock(&ph->data->m_food);
+	ft_print(ph, "is eating");
+	ft_usleep(ph->data->t2e);
+	pthread_mutex_lock(&ph->data->m_food);
 	if (ph->data->status == ALIVE)
 		food_counter(ph);
-	if (ph->data->status != ALIVE)
-		return ;
-	ft_usleep(ph->data->t2e);
-	pthread_mutex_unlock(&ph->lfork);
+	pthread_mutex_unlock(&ph->data->m_food);
 	pthread_mutex_unlock(ph->rfork);
-}
-
-static void	ft_eat_l(t_philo *ph)
-{
-	if (ph->data->status != ALIVE)
-		return ;
-	pthread_mutex_lock(&ph->lfork);
-	pthread_mutex_lock(&ph->mutex->m_print);
-	if (ph->data->status == ALIVE)
-		ft_print(ph, "has taken a fork");
-	pthread_mutex_unlock(&ph->mutex->m_print);
-	pthread_mutex_lock(ph->rfork);
-	pthread_mutex_lock(&ph->mutex->m_print);
-	if (ph->data->status == ALIVE)
-		checkdeath(ph);		// taking up 200 ms time && too few deathchecks. must print death not later than 10 ms after philo dies
-	if (ph->data->status == ALIVE)
-	{
-		ft_print(ph, "has taken a fork");
-		ft_print(ph, "is eating");
-	}
-	pthread_mutex_unlock(&ph->mutex->m_print);
-	if (ph->data->status == ALIVE)
-		food_counter(ph);
-	if (ph->data->status != ALIVE)
-		return ;
-	ft_usleep(ph->data->t2e);
 	pthread_mutex_unlock(&ph->lfork);
-	pthread_mutex_unlock(ph->rfork);
 }
 
 void	*lifecycle(void *arg)
 {
 	t_philo	*ph;
+	pthread_t	t_death;
 
 	ph = (t_philo *)arg;
+	if (pthread_create(&t_death, NULL, &deathcycle, ph))
+	{
+		printf("Pthread create failed\n");
+		return (NULL);
+	}
+	if (pthread_detach(t_death))
+	{
+		printf("Pthread detach failed\n");
+		return (NULL);
+	}
 	while (ph->data->status == ALIVE)
 	{
-		if (ph->data->status != ALIVE)
-			return (NULL);
-		if (ph->id % 2)
-			ft_eat_l(ph);
-		else
-			ft_eat_r(ph);
-		ft_sleep(ph);
+		ft_eat(ph);
+		ft_print(ph, "is sleeping");
+		ft_usleep(ph->data->t2s);
+		ft_print(ph, "is thinking");
 	}
 	return (NULL);
+}
+
+int	thread_init(t_philo *ph, int i)
+{
+	while (ph->data->status == ALIVE)
+	{
+		i = 0;
+		while (i < ph->data->cnt)
+		{
+			if (pthread_create(&ph[i].t_ph, NULL, &lifecycle, &ph[i]))
+			{
+				printf("Pthread create failed\n");
+				return (1);
+			}
+			i = i + 2;
+		}
+		ft_usleep(ph->data->t2e / 2);
+		i = 1;
+		while (i < ph->data->cnt)
+		{
+			if (pthread_create(&ph[i].t_ph, NULL, &lifecycle, &ph[i]))
+			{
+				printf("Pthread create failed\n");
+				return (1);
+			}
+			i = i + 2;
+		}
+		i = -1;
+		while (++i < ph->data->cnt)
+		{
+			if (pthread_join(ph[i].t_ph, NULL))
+			{
+				printf("Pthread detach failed\n");
+				return (1);
+			}
+		}
+	}
+	pthread_mutex_destroy(&ph->data->m_death);
+	pthread_mutex_destroy(&ph->data->m_food);
+	pthread_mutex_destroy(&ph->data->m_print);
+	return (0);
 }
