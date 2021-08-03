@@ -25,7 +25,8 @@ typedef struct s_data
 	pthread_t		t_death;
 	pthread_mutex_t	m_print;
 	pthread_mutex_t	m_food;
-	pthread_mutex_t	m_death;	
+	pthread_mutex_t	m_death;
+	pthread_mutex_t	m_status;	
 }				t_data;
 typedef struct s_philo
 {

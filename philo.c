@@ -58,7 +58,8 @@ static int	init_data(t_data *data, int argc, char **argv)
 		data->meals = ft_atoi_philo(argv[5]);
 	if (pthread_mutex_init(&data->m_print, NULL) \
 	|| pthread_mutex_init(&data->m_death, NULL) \
-	|| pthread_mutex_init(&data->m_food, NULL))
+	|| pthread_mutex_init(&data->m_food, NULL) \
+	|| pthread_mutex_init(&data->m_status, NULL))
 	{
 		printf("Mutex init failed\n");
 		return (1);

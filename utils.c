@@ -6,7 +6,7 @@ void	ft_usleep(uint64_t time)
 
 	timer = ft_gettime();
 	while ((ft_gettime() - timer) < time)
-		usleep(1);
+		usleep(500);
 }
 
 uint64_t	ft_gettime()

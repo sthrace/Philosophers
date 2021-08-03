@@ -2,24 +2,27 @@
 
 static void	ft_eat(t_philo *ph)
 {
-	pthread_mutex_lock(&ph->lfork);
+	if (ph->id % 2)
+		pthread_mutex_lock(ph->rfork);
+	else
+		pthread_mutex_lock(&ph->lfork);
 	ft_print(ph, "has taken a fork");
 	if (ph->data->cnt == 1)
 	{
-		pthread_mutex_unlock(&ph->lfork);
+		pthread_mutex_unlock(ph->rfork);
 		return ;
 	}
-	pthread_mutex_lock(ph->rfork);
+	if (ph->id % 2)
+		pthread_mutex_lock(&ph->lfork);
+	else
+		pthread_mutex_lock(ph->rfork);
 	ft_print(ph, "has taken a fork");
 	pthread_mutex_lock(&ph->data->m_food);
 	ph->last_meal = ft_gettime();
 	pthread_mutex_unlock(&ph->data->m_food);
 	ft_print(ph, "is eating");
 	ft_usleep(ph->data->t2e);
-	pthread_mutex_lock(&ph->data->m_food);
-	if (ph->data->status == ALIVE)
-		food_counter(ph);
-	pthread_mutex_unlock(&ph->data->m_food);
+	food_counter(ph);
 	pthread_mutex_unlock(ph->rfork);
 	pthread_mutex_unlock(&ph->lfork);
 }
@@ -52,37 +55,21 @@ void	*lifecycle(void *arg)
 
 int	thread_init(t_philo *ph, int i)
 {
-	while (ph->data->status == ALIVE)
+	while (++i < ph->data->cnt)
 	{
-		i = 0;
-		while (i < ph->data->cnt)
+		if (pthread_create(&ph[i].t_ph, NULL, &lifecycle, &ph[i]))
 		{
-			if (pthread_create(&ph[i].t_ph, NULL, &lifecycle, &ph[i]))
-			{
-				printf("Pthread create failed\n");
-				return (1);
-			}
-			i = i + 2;
+			printf("Pthread create failed\n");
+			return (1);
 		}
-		ft_usleep(ph->data->t2e / 2);
-		i = 1;
-		while (i < ph->data->cnt)
+	}
+	i = -1;
+	while (++i < ph->data->cnt)
+	{
+		if (pthread_join(ph[i].t_ph, NULL))
 		{
-			if (pthread_create(&ph[i].t_ph, NULL, &lifecycle, &ph[i]))
-			{
-				printf("Pthread create failed\n");
-				return (1);
-			}
-			i = i + 2;
-		}
-		i = -1;
-		while (++i < ph->data->cnt)
-		{
-			if (pthread_join(ph[i].t_ph, NULL))
-			{
-				printf("Pthread detach failed\n");
-				return (1);
-			}
+			printf("Pthread detach failed\n");
+			return (1);
 		}
 	}
 	pthread_mutex_destroy(&ph->data->m_death);
