@@ -10,12 +10,28 @@ static void	ft_eat(t_philo *ph)
 	if (ph->data->cnt == 1)
 	{
 		pthread_mutex_unlock(ph->rfork);
-		return ;
+		ft_eat(ph) ;
 	}
 	if (ph->id % 2)
-		pthread_mutex_lock(&ph->lfork);
+	{
+		if (pthread_mutex_lock(&ph->lfork))
+		{
+			pthread_mutex_unlock(ph->rfork);
+			// ft_usleep(ph->data->t2s / ph->data->cnt);
+			ft_eat(ph);
+			// return ;
+		}
+	}
 	else
-		pthread_mutex_lock(ph->rfork);
+	{
+		if (pthread_mutex_lock(ph->rfork))
+		{
+			pthread_mutex_unlock(&ph->lfork);
+			// ft_usleep(ph->data->t2s / ph->data->cnt);
+			ft_eat(ph);
+			// return ;
+		}
+	}
 	ft_print(ph, "has taken a fork");
 	pthread_mutex_lock(&ph->data->m_food);
 	ph->last_meal = ft_gettime();

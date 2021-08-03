@@ -41,6 +41,7 @@ void	*deathcycle(void *arg)
 			ph->data->status = DEAD;
 			break ;
 		}
+		ft_usleep(100 / ph->data->cnt);
 	}
 	return (NULL);
 }
