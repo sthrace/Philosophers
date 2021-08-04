@@ -71,13 +71,26 @@ void	*lifecycle(void *arg)
 
 int	thread_init(t_philo *ph, int i)
 {
-	while (++i < ph->data->cnt)
+	i = 0;
+	while (i < ph->data->cnt)
 	{
 		if (pthread_create(&ph[i].t_ph, NULL, &lifecycle, &ph[i]))
 		{
 			printf("Pthread create failed\n");
 			return (1);
 		}
+		i += 2;
+	}
+	ft_usleep(ph->data->t2e / 2);
+	i = 1;
+	while (i < ph->data->cnt)
+	{
+		if (pthread_create(&ph[i].t_ph, NULL, &lifecycle, &ph[i]))
+		{
+			printf("Pthread create failed\n");
+			return (1);
+		}
+		i += 2;
 	}
 	i = -1;
 	while (++i < ph->data->cnt)
