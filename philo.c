@@ -1,8 +1,20 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   philo.c                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: sthrace <marvin@42.fr>                     +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2021/08/04 09:31:08 by sthrace           #+#    #+#             */
+/*   Updated: 2021/08/04 09:31:10 by sthrace          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "philo.h"
 
 static int	ft_atoi_philo(char *arg)
 {
-	int	i;
+	int		i;
 	long	res;
 
 	i = 0;
@@ -39,7 +51,7 @@ static int	init_philo(t_philo *ph, t_data *data)
 			ph[i].rfork = &ph[i + 1].lfork;
 		i++;
 	}
-	if (thread_init(ph, -1))
+	if (thread_init(ph, 0))
 		return (1);
 	return (0);
 }
@@ -64,8 +76,8 @@ static int	init_data(t_data *data, int argc, char **argv)
 		printf("Mutex init failed\n");
 		return (1);
 	}
-	return (0);	
-	if (!data->cnt || !data->t2d || !data->t2e || !data->t2s || (argc == 6 && !data->meals) || !data->start)
+	if (!data->cnt || !data->t2d || !data->t2e || !data->t2s \
+	|| (argc == 6 && !data->meals) || !data->start)
 	{
 		printf("Data initialization failed\n");
 		return (1);
@@ -116,5 +128,6 @@ int	main(int argc, char **argv)
 	}
 	if (init_philo(ph, &data))
 		return (1);
+	free(ph);
 	return (0);
 }

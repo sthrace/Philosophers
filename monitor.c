@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   monitor.c                                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: sthrace <marvin@42.fr>                     +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2021/08/04 09:31:16 by sthrace           #+#    #+#             */
+/*   Updated: 2021/08/04 09:31:18 by sthrace          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "philo.h"
 
 void	food_counter(t_philo *ph)
@@ -41,7 +53,7 @@ void	*deathcycle(void *arg)
 			ph->data->status = DEAD;
 			break ;
 		}
-		ft_usleep(9 / ph->data->cnt);
+		ft_usleep(9);
 	}
 	return (NULL);
 }

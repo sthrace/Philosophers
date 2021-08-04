@@ -42,12 +42,11 @@ typedef struct s_philo
 
 // philo.c //
 
-// init.c //
-
 // activity.c //
 
 int	thread_init(t_philo *ph, int i);
 void	*lifecycle(void *arg);
+void	ft_eat(t_philo *ph);
 
 // monitor.c //
 
@@ -59,5 +58,6 @@ void	*deathcycle(void *arg);
 void	ft_usleep(uint64_t time);
 uint64_t	ft_gettime();
 void	ft_print(t_philo *ph, char *str);
+void	mutex_destroy(t_philo *ph);
 
 #endif

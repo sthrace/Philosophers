@@ -1,8 +1,40 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   activity.c                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: sthrace <marvin@42.fr>                     +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2021/08/04 09:31:25 by sthrace           #+#    #+#             */
+/*   Updated: 2021/08/04 09:31:27 by sthrace          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "philo.h"
 
-static void	ft_eat(t_philo *ph)
+static void	ft_locked(t_philo *ph, int type)
 {
-	if (ph->id % 2)
+	if (type == 1)
+	{
+		if (pthread_mutex_lock(&ph->lfork))
+		{
+			pthread_mutex_unlock(ph->rfork);
+			ft_eat(ph);
+		}
+	}
+	if (type == 2)
+	{
+		if (pthread_mutex_lock(ph->rfork))
+		{
+			pthread_mutex_unlock(&ph->lfork);
+			ft_eat(ph);
+		}
+	}
+}
+
+void	ft_eat(t_philo *ph)
+{
+	if (!(ph->id % 2))
 		pthread_mutex_lock(ph->rfork);
 	else
 		pthread_mutex_lock(&ph->lfork);
@@ -10,28 +42,12 @@ static void	ft_eat(t_philo *ph)
 	if (ph->data->cnt == 1)
 	{
 		pthread_mutex_unlock(ph->rfork);
-		ft_eat(ph) ;
+		return ;
 	}
-	if (ph->id % 2)
-	{
-		if (pthread_mutex_lock(&ph->lfork))
-		{
-			pthread_mutex_unlock(ph->rfork);
-			// ft_usleep(ph->data->t2s / ph->data->cnt);
-			ft_eat(ph);
-			// return ;
-		}
-	}
+	if (!(ph->id % 2))
+		ft_locked(ph, 1);
 	else
-	{
-		if (pthread_mutex_lock(ph->rfork))
-		{
-			pthread_mutex_unlock(&ph->lfork);
-			// ft_usleep(ph->data->t2s / ph->data->cnt);
-			ft_eat(ph);
-			// return ;
-		}
-	}
+		ft_locked(ph, 2);
 	ft_print(ph, "has taken a fork");
 	pthread_mutex_lock(&ph->data->m_food);
 	ph->last_meal = ft_gettime();
@@ -45,7 +61,7 @@ static void	ft_eat(t_philo *ph)
 
 void	*lifecycle(void *arg)
 {
-	t_philo	*ph;
+	t_philo		*ph;
 	pthread_t	t_death;
 
 	ph = (t_philo *)arg;
@@ -69,27 +85,31 @@ void	*lifecycle(void *arg)
 	return (NULL);
 }
 
+static int	create_threads(t_philo *ph, int i)
+{
+	if (pthread_create(&ph[i].t_ph, NULL, &lifecycle, &ph[i]))
+	{
+		printf("Pthread create failed\n");
+		return (1);
+	}
+	ft_usleep(1 / 10);
+	return (0);
+}
+
 int	thread_init(t_philo *ph, int i)
 {
-	i = 0;
 	while (i < ph->data->cnt)
 	{
-		if (pthread_create(&ph[i].t_ph, NULL, &lifecycle, &ph[i]))
-		{
-			printf("Pthread create failed\n");
+		if (create_threads(ph, i))
 			return (1);
-		}
 		i += 2;
 	}
-	ft_usleep(ph->data->t2e / 2);
+	ft_usleep(ph->data->t2e / ph->data->cnt);
 	i = 1;
 	while (i < ph->data->cnt)
 	{
-		if (pthread_create(&ph[i].t_ph, NULL, &lifecycle, &ph[i]))
-		{
-			printf("Pthread create failed\n");
+		if (create_threads(ph, i))
 			return (1);
-		}
 		i += 2;
 	}
 	i = -1;
@@ -101,8 +121,6 @@ int	thread_init(t_philo *ph, int i)
 			return (1);
 		}
 	}
-	pthread_mutex_destroy(&ph->data->m_death);
-	pthread_mutex_destroy(&ph->data->m_food);
-	pthread_mutex_destroy(&ph->data->m_print);
+	mutex_destroy(ph);
 	return (0);
 }
