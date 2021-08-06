@@ -9,6 +9,7 @@ HEADER_B = philo_bonus.h
 CC		= gcc
 FLAGS	= -g3 -Wall -Werror -Wextra -pthread
 RM		= rm -rf
+DEPS	= $(OBJS:.o=.d)
 
 all:	$(HEADER) $(NAME)
 
@@ -20,6 +21,7 @@ $(NAME):	$(OBJS) PHILO
 $(NAME_B):	$(OBJS_B) PHILO_B
 			@$(CC) $(FLAGS) $(OBJS_B) -o $(NAME_B)		
 
+-include $(DEPS)
 %.o: %.c
 			$(CC) -c $(FLAGS) -o $@ $<
 
