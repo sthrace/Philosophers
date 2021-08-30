@@ -104,7 +104,7 @@ int	thread_init(t_philo *ph, int i)
 			return (1);
 		i += 2;
 	}
-	ft_usleep(ph->data->t2e / ph->data->cnt);
+	ft_usleep(10);
 	i = 1;
 	while (i < ph->data->cnt)
 	{

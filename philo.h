@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   philo.h                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: sthrace <marvin@42.fr>                     +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2021/08/04 09:53:26 by sthrace           #+#    #+#             */
+/*   Updated: 2021/08/04 09:53:28 by sthrace          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef PHILO_H
 # define PHILO_H
 
@@ -12,6 +24,7 @@
 # define ALIVE 0
 # define DEAD 1
 # define FULL 2
+
 typedef struct s_data
 {
 	int				cnt;
@@ -28,6 +41,7 @@ typedef struct s_data
 	pthread_mutex_t	m_death;
 	pthread_mutex_t	m_status;	
 }				t_data;
+
 typedef struct s_philo
 {
 	int				id;
@@ -39,25 +53,24 @@ typedef struct s_philo
 	t_data			*data;
 }				t_philo;
 
-
 // philo.c //
 
 // activity.c //
 
-int	thread_init(t_philo *ph, int i);
-void	*lifecycle(void *arg);
-void	ft_eat(t_philo *ph);
+int			thread_init(t_philo *ph, int i);
+void		*lifecycle(void *arg);
+void		ft_eat(t_philo *ph);
 
 // monitor.c //
 
-void	food_counter(t_philo *ph);
-void	*deathcycle(void *arg);
+void		food_counter(t_philo *ph);
+void		*deathcycle(void *arg);
 
 // utils.c //
 
-void	ft_usleep(uint64_t time);
-uint64_t	ft_gettime();
-void	ft_print(t_philo *ph, char *str);
-void	mutex_destroy(t_philo *ph);
+void		ft_usleep(uint64_t time);
+uint64_t	ft_gettime(void);
+void		ft_print(t_philo *ph, char *str);
+void		mutex_destroy(t_philo *ph);
 
 #endif
